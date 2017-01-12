@@ -46,7 +46,7 @@ Your board is ready!
 
 2. Control application (Qt)
 
-The source code of this applicatin is located in the `bt-qt-control` directory.
+The source code of this applicatin is located in the [bt-qt-control](bt-qt-control) directory.
 You need Qt >= 5.7 to build it.
 
 * Configure a Qt development environment. [Qt website](http://www.qt.io) is a good start.
