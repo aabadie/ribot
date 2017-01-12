@@ -25,3 +25,5 @@ bin/
 *.elf
 
 *.pro.user
+
+build/
