@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/main.qml</file>
+        <file>qml/Scanner.qml</file>
+        <file>qml/Button.qml</file>
+        <file>qml/Joystick.qml</file>
+    </qresource>
+</RCC>
