@@ -18,7 +18,7 @@ This project aims at showing the possibility provided by the RT OS
 
 1. Firmware with Bluetooth communication
 
-The source code of this firmware is located in the `bt-fw` directory.
+The source code of this firmware is located in the [bt-fw](bt-fw) directory.
 
 Note that the firmware is designed to work on a
 [Nucleo-f446](http://www.st.com/en/evaluation-tools/nucleo-f446re.html) board
