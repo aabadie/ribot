@@ -2,11 +2,12 @@
 APPLICATION = ribot_coap
 
 # If no BOARD is found in the environment, use this default:
-BOARD = nucleo-f446
+BOARD ?= nucleo-f446
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
+ifeq ($(BOARD), nucleo-f446)
 ## Uncomment to support the XBee module and nomac
 USEMODULE += xbee
 USEMODULE += gnrc_nomac
@@ -16,6 +17,36 @@ XBEE_UART ?= "1"
 
 ## export UART to params file
 CFLAGS += -DXBEE_UART=$(XBEE_UART)
+
+## D4
+RIGHT_DIRECTION_PIN = GPIO_PIN\(PORT_B,5\)
+## D5
+RIGHT_PWM_DEV  = 1
+RIGHT_PWM_CHAN = 0
+
+## D7
+LEFT_DIRECTION_PIN = GPIO_PIN\(PORT_A,8\)
+## D6
+LEFT_PWM_DEV   = 0
+LEFT_PWM_CHAN  = 2
+else ## SAMR21
+RIGHT_DIRECTION_PIN = GPIO_PIN\(PA,18\)
+LEFT_DIRECTION_PIN = GPIO_PIN\(PA,19\)
+## PA6
+RIGHT_PWM_DEV  = 0
+RIGHT_PWM_CHAN = 0
+## PA7
+LEFT_PWM_DEV   = 0
+LEFT_PWM_CHAN  = 1
+endif
+
+CFLAGS += -DRIGHT_DIRECTION_PIN=$(RIGHT_DIRECTION_PIN)
+CFLAGS += -DRIGHT_PWM_DEV=$(RIGHT_PWM_DEV)
+CFLAGS += -DRIGHT_PWM_CHAN=$(RIGHT_PWM_CHAN)
+
+CFLAGS += -DLEFT_DIRECTION_PIN=$(LEFT_DIRECTION_PIN)
+CFLAGS += -DLEFT_PWM_DEV=$(LEFT_PWM_DEV)
+CFLAGS += -DLEFT_PWM_CHAN=$(LEFT_PWM_CHAN)
 
 ## add current directory to the include path. Putting it in CFLAGS will make
 ## it go to the beginning, before the standard includes.

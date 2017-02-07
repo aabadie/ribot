@@ -121,6 +121,24 @@ int main(void)
     /* microcoap_server uses conn which uses gnrc which needs a msg queue */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     
+    /* PWM initialization */
+    for (unsigned i = 0; i < PWM_NUMOF; i++) {
+        if (pwm_init(PWM_DEV(i), MODE, FREQU, STEPS) == 0) {
+            printf("Error initializing PWM_%d\n", i);
+            return 1;
+        }
+    }
+    
+    /* Direction GPIO */
+    if (gpio_init(RIGHT_DIRECTION_PIN, GPIO_OUT) < 0) {
+        printf("Error while initializing right direction pin\n");
+        return 1;
+    }
+    if (gpio_init(LEFT_DIRECTION_PIN, GPIO_OUT) < 0) {
+        printf("Error while initializing left direction pin\n");
+        return 1;
+    }
+    
     puts("Waiting for address autoconfiguration...");
     xtimer_sleep(3);
     

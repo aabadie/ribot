@@ -15,14 +15,11 @@
 #include "periph/gpio.h"
 #include "periph/pwm.h"
 
-/* PWM */
-#define MODE                        PWM_LEFT
-#define FREQU                       (1000U)
-#define STEPS                       (256U)
+#include "debug.h"
+#define ENABLE_DEBUG (1)
 
-/* DIRECTION GPIO */
-#define RIGHT_DIRECTION_PIN         GPIO_PIN(PORT_B, 5)
-#define LEFT_DIRECTION_PIN          GPIO_PIN(PORT_A, 8)
+#define SPEED_FACTOR 0.8
+#define ANGLE_FACTOR 0.5
 
 #define MAX_RESPONSE_LEN 500
 static uint8_t response[MAX_RESPONSE_LEN] = { 0 };
@@ -182,17 +179,17 @@ static int handle_get_ribot(coap_rw_buffer_t *scratch,
 }
 
 
-static void parse_message(int16_t * right_speed_ratio, int16_t * left_speed_ratio, int16_t * crc)
+static void parse_message(int16_t * dir_speed_ratio, int16_t * angle_speed_ratio, int16_t * crc)
 {
     char * strtokIndx;
   
     /* Left speed ratio */
     strtokIndx = strtok(message, ":");
-    *left_speed_ratio = atoi(strtokIndx);
+    *angle_speed_ratio = atoi(strtokIndx);
   
     /* Right speed ratio */
     strtokIndx = strtok(NULL, ":");
-    *right_speed_ratio = atoi(strtokIndx);
+    *dir_speed_ratio = atoi(strtokIndx);
   
     /* CRC */
     strtokIndx = strtok(NULL, "\n");
@@ -205,8 +202,11 @@ static void parse_message(int16_t * right_speed_ratio, int16_t * left_speed_rati
 #endif
 }
 
-static void update_control(int16_t right_speed_ratio, int16_t left_speed_ratio)
+static void update_control(int16_t dir_speed_ratio, int16_t angle_speed_ratio)
 {
+    int16_t right_speed_ratio = (int16_t)(SPEED_FACTOR * (dir_speed_ratio - angle_speed_ratio * ANGLE_FACTOR));
+    int16_t left_speed_ratio = (int16_t)(SPEED_FACTOR * (dir_speed_ratio + angle_speed_ratio * ANGLE_FACTOR));
+    
     if (right_speed_ratio < -255) {
         right_speed_ratio = -255;
     }
@@ -221,7 +221,7 @@ static void update_control(int16_t right_speed_ratio, int16_t left_speed_ratio)
     }
     
     uint8_t right_dir = right_speed_ratio > 0 ? 1 : 0;
-    uint8_t left_dir = left_speed_ratio > 0 ? 0 : 1;;
+    uint8_t left_dir = left_speed_ratio > 0 ? 0 : 1;
     
     if (right_speed_ratio < 0) {
         right_speed_ratio *= -1;
@@ -241,8 +241,8 @@ static void update_control(int16_t right_speed_ratio, int16_t left_speed_ratio)
 
     gpio_write(RIGHT_DIRECTION_PIN, right_dir);
     gpio_write(LEFT_DIRECTION_PIN, left_dir);
-    pwm_set(PWM_DEV(1), 0, right_speed); // D5
-    pwm_set(PWM_DEV(0), 2, left_speed);  // D6
+    pwm_set(PWM_DEV(RIGHT_PWM_DEV), RIGHT_PWM_CHAN, right_speed);
+    pwm_set(PWM_DEV(LEFT_PWM_DEV), LEFT_PWM_CHAN, left_speed);
 }
 
 static int handle_put_ribot(coap_rw_buffer_t *scratch,
@@ -254,19 +254,18 @@ static int handle_put_ribot(coap_rw_buffer_t *scratch,
     memset(message, 0, sizeof(message));
     sprintf(message, "%s", (char*)inpkt->payload.p);
     
+    printf("%s\n", message);
+    int16_t angle_speed_ratio, dir_speed_ratio, crc;
+    parse_message(&dir_speed_ratio, &angle_speed_ratio, &crc);
     
-    int16_t right_speed_ratio, left_speed_ratio, crc;
-    parse_message(&right_speed_ratio, &left_speed_ratio, &crc);
-    
-    if (crc == (left_speed_ratio + right_speed_ratio)) {
-        if (left_speed_ratio == 0 && right_speed_ratio == 0) {
-            sprintf(status, "Ready");
+    if (crc == (angle_speed_ratio + dir_speed_ratio)) {
+        if (angle_speed_ratio == 0 && dir_speed_ratio == 0) {
+            sprintf(status, "ribot:Ready");
         }
         else {
-            sprintf(status, "Moving");
+            sprintf(status, "ribot:Moving");
         }
-        
-        update_control(right_speed_ratio, left_speed_ratio);
+        update_control(dir_speed_ratio, angle_speed_ratio);
     }
     else {
         resp = COAP_RSPCODE_BAD_REQUEST;
