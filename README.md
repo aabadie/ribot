@@ -14,37 +14,45 @@ This project aims at showing the possibilities provided by the real-time OS
 ![Image of RiBot](https://github.com/aabadie/ribot/blob/master/docs/images/ribot.png)
 
 
+### Hardware setup
+
+Follow the instructions [here](docs) to build your own RiBot.
+
 ### Provided source codes
 
 1. Firmware with Bluetooth communication
-
-The source code of this firmware is located in the [bt-fw](bt-fw) directory.
-
-Note that the firmware is designed to work on a
-[Nucleo-f446](http://www.st.com/en/evaluation-tools/nucleo-f446re.html) board
-with [RIOT](http://github.com/RIOT-OS/RIOT.git).
-It can be easily adapted to any board supported by RIOT with support for GPIO (2
-minimum), PWM (2 minimum) and UART (2 minimum).
-
-To build and flash it, you need:
-* To clone RIOT source code:
+  The source code of this firmware is located in the [bt-fw](bt-fw) directory.
+  Note that the firmware is designed to work on a
+  [Nucleo-f446](http://www.st.com/en/evaluation-tools/nucleo-f446re.html) board
+  with [RIOT](http://github.com/RIOT-OS/RIOT.git).
+  It can be easily adapted to any board supported by RIOT with support for GPIO (2
+  minimum), PWM (2 minimum) and UART (2 minimum).
+  To build and flash it, you need:
+  * To clone RIOT source code:
 ```
 $ mkdir ~/ribot-project && cd ~/ribot-project
 $ git clone https://github.com/RIOT-OS/RIOT.git
 ```
-* To clone this repository:
+  * To clone this repository:
 ```
 $ git clone https://github.com/aabadie/ribot.git
 ```
-* To plug the board on your computer (only Linux and OSX are supported)
-* To issue the following commands:
+  * To plug the board on your computer (only Linux and OSX are supported)
+  * To issue the following commands:
 ```
 $ cd bt-fw
 $ make RIOTBASE=~/ribot-project RIOT BOARD=nucleo-f446 flash
 ```
 Your board is ready!
 
-2. Control application (Qt)
+2. Firmware with CoAP control
+  The source code of this firmware is located in the [coap-fw](coap-fw) directory.
+  Note that the firmware is designed to work on a
+  [Nucleo-f446](http://www.st.com/en/evaluation-tools/nucleo-f446re.html) board
+  with [RIOT](http://github.com/RIOT-OS/RIOT.git). You'll need an XBee and an arduino
+  xbee shield.
+
+3. Control application (Qt)
 
 The source code of this applicatin is located in the [bt-qt-control](bt-qt-control) directory.
 You need Qt >= 5.7 to build it.
@@ -53,5 +61,3 @@ You need Qt >= 5.7 to build it.
   You have to use QtCreator for building this application.
 * Load the `RiBot.pro` file in QtCreator.
 * Build and Run using the Desktop Kit
-
-

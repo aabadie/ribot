@@ -27,6 +27,12 @@ Here is the list of elements used to setup RiBot:
   * An [Atmel SAMR21 Xplained Pro](http://www.atmel.com/tools/ATSAMR21-XPRO.aspx)
     board running the
     [CoAP controlled firmware](https://github.com/aabadie/ribot/tree/master/coap-fw).
+* A [Sparfun bluetooth module](https://www.sparkfun.com/products/12577) for use
+  with the [bluetooth control mode](https://github.com/aabadie/ribot/tree/master/bt-fw).
+* An [XBee](https://www.adafruit.com/products/128) +
+  [Arduino Xbee shield]()https://www.arduino.cc/en/Main/ArduinoWirelessShield
+  if you planned to control it via CoAP. Note that
+  this setup doesn't work for the moment. Prefer simply use the Atmel board.
 
 ### Setup steps
 
@@ -63,6 +69,9 @@ Here is the list of elements used to setup RiBot:
      `PWM2` to `D6`,
    * With the Atmel connect `DIR1` to `PA18`, `DIR2` to `PA19`, `PWM1` to
      `PA6` and `PWM2` to `PA7`.
+4. Flash the boards with the required firmwares:
+  * [Bluetooth mode firmware](https://github.com/aabadie/ribot/tree/master/bt-fw)
+  * [CoAP mode firmware](https://github.com/aabadie/ribot/tree/master/coap-fw)
 
 
 #### License
