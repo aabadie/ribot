@@ -196,8 +196,8 @@ static void parse_message(int16_t * dir_speed_ratio, int16_t * angle_speed_ratio
     *crc = atoi(strtokIndx);
     
 #ifdef ENABLE_DEBUG
-    DEBUG("Right speed ratio: %i\n", (int)*right_speed_ratio);
-    DEBUG("Left speed ratio : %i\n", (int)*left_speed_ratio);
+    DEBUG("Dir speed ratio: %i\n", (int)*dir_speed_ratio);
+    DEBUG("Angle speed ratio : %i\n", (int)*angle_speed_ratio);
     DEBUG("CRC              : %i\n", (int)*crc);
 #endif
 }
