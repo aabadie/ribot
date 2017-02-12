@@ -29,6 +29,9 @@
 #define ENABLE_DEBUG                (1)
 #include "debug.h"
 
+#define SPEED_FACTOR 0.8
+#define ANGLE_FACTOR 0.5
+
 /* UART communication */
 #define PC_UART                     UART_DEV(0)
 #define BT_UART                     UART_DEV(1)
@@ -66,31 +69,34 @@ static void bt_rx_cb(void *dev, uint8_t data)
     }
 }
 
-static void parse_message(int16_t * right_speed_ratio, int16_t * left_speed_ratio, int16_t * crc)
+static void parse_message(int16_t * dir_speed_ratio, int16_t * angle_speed_ratio, int16_t * crc)
 {
     char * strtokIndx;
   
     /* Left speed ratio */
     strtokIndx = strtok(message, ":");
-    *left_speed_ratio = atoi(strtokIndx);
+    *angle_speed_ratio = atoi(strtokIndx);
   
     /* Right speed ratio */
     strtokIndx = strtok(NULL, ":");
-    *right_speed_ratio = atoi(strtokIndx);
+    *dir_speed_ratio = atoi(strtokIndx);
   
     /* CRC */
     strtokIndx = strtok(NULL, "\n");
     *crc = atoi(strtokIndx);
     
 #ifdef ENABLE_DEBUG
-    DEBUG("Right speed ratio: %i\n", (int)*right_speed_ratio);
-    DEBUG("Left speed ratio : %i\n", (int)*left_speed_ratio);
+    DEBUG("Dir speed ratio: %i\n", (int)*dir_speed_ratio);
+    DEBUG("Angle speed ratio : %i\n", (int)*angle_speed_ratio);
     DEBUG("CRC              : %i\n", (int)*crc);
 #endif
 }
 
-static void update_control(int16_t right_speed_ratio, int16_t left_speed_ratio)
+static void update_control(int16_t dir_speed_ratio, int16_t angle_speed_ratio)
 {
+    int16_t right_speed_ratio = (int16_t)(SPEED_FACTOR * (dir_speed_ratio - angle_speed_ratio * ANGLE_FACTOR));
+    int16_t left_speed_ratio = (int16_t)(SPEED_FACTOR * (dir_speed_ratio + angle_speed_ratio * ANGLE_FACTOR));
+    
     if (right_speed_ratio < -255) {
         right_speed_ratio = -255;
     }
@@ -190,15 +196,15 @@ int main(void)
 #ifdef ENABLE_DEBUG
         DEBUG("%s\n", message);
 #endif
+        ;
+        int16_t angle_speed_ratio, dir_speed_ratio, crc;
+        parse_message(&dir_speed_ratio, &angle_speed_ratio, &crc);
         
-        int16_t right_speed_ratio, left_speed_ratio, crc;
-        parse_message(&right_speed_ratio, &left_speed_ratio, &crc);
-        
-        if (crc == (left_speed_ratio + right_speed_ratio)) {
+        if (crc == (angle_speed_ratio + dir_speed_ratio)) {
 #ifdef ENABLE_DEBUG
             DEBUG("Update control\n");
 #endif
-            update_control(right_speed_ratio, left_speed_ratio);
+            update_control(dir_speed_ratio, angle_speed_ratio);
         }
         
         ringbuffer_remove(&(ctx.rx_buf), sizeof(message));

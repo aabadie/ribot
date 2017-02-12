@@ -7,8 +7,6 @@ Item {
     property int headerHeight: 30
     property string socketData: "0:0\n"
     
-    property double speedFactor: 0.9
-    property double angularSpeedFactor: 0.5
     property int refreshInterval: 100
     
  
@@ -129,14 +127,11 @@ Item {
                 }
                 
                 onPositionChanged: {
-                    var angSpeedRatio = angularSpeedFactor * mcx / ((joystick.width - handle.width)* 0.5)
-                    var dirSpeedRatio = mcy / ((joystick.height - handle.height)* 0.5)
+                    var angSpeedRatio = (angularSpeedFactor * mcx / ((joystick.width - handle.width)* 0.5)) * 255
+                    var dirSpeedRatio = (mcy / ((joystick.height - handle.height)* 0.5)) * 255
+                    var crc = angSpeedRatio + dirSpeedRatio
                     
-                    var rightSpeedRatio = Math.round(speedFactor * (dirSpeedRatio - angSpeedRatio) * 255)
-                    var leftSpeedRatio = Math.round(speedFactor * (dirSpeedRatio + angSpeedRatio) * 255)
-                    var crc = rightSpeedRatio + leftSpeedRatio
-                    
-                    socketData = qsTr("%1:%2:%3\n").arg(rightSpeedRatio).arg(leftSpeedRatio).arg(crc)
+                    socketData = qsTr("%1:%2:%3\n").arg(angSpeedRatio).arg(dirSpeedRatio).arg(crc)
                 }
             }
         }
