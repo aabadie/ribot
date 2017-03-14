@@ -28,12 +28,20 @@
 #include "net/af.h"
 #include "net/gnrc/ipv6.h"
 #include "net/conn/udp.h"
+#include "board.h"
+#include "periph/gpio.h"
+#include "periph/pwm.h"
 
 #ifndef BROKER_ADDR
 #define BROKER_ADDR "2001:660:3207:102::4"
 #endif
 
 #define BROKER_PORT 5683
+
+/* PWM */
+#define MODE                        PWM_LEFT
+#define FREQU                       (1000U)
+#define STEPS                       (256U)
 
 #define INTERVAL              (30000000U)    /* set interval to 30 seconds */
 #define MAIN_QUEUE_SIZE       (8)
